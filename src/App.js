@@ -1,116 +1,81 @@
 /*global chrome*/
-import React, { useState, useEffect } from 'react';
-import Button from '@material-ui/core/Button';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import { makeStyles } from '@material-ui/styles';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import Button from "@material-ui/core/Button";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import { makeStyles } from "@material-ui/styles";
+import "./App.css";
 
 // eslint-disable-next-line
 Date.prototype.addDays = function (days) {
   var date = new Date(this.valueOf());
   date.setDate(date.getDate() + days);
   return date;
-}
+};
 
 /**
  * Start and end dates
  */
-const QUARTER_DATES = {
-  'Autumn 2019': {
-    instructionBegins: { year: 2019, month: 8, day: 25, hour: 8, minute: 0 },
-    instructionEnds: { year: 2019, month: 11, day: 6, hour: 23, minute: 59 }
-  },
-  'Fall 2019': {
-    instructionBegins: { year: 2019, month: 8, day: 25, hour: 8, minute: 0 },
-    instructionEnds: { year: 2019, month: 11, day: 6, hour: 23, minute: 59 }
-  },
-  'Winter 2020': {
-    instructionBegins: { year: 2020, month: 0, day: 6, hour: 8, minute: 0 },
-    instructionEnds: { year: 2020, month: 2, day: 13, hour: 23, minute: 59 }
-  },
-  'Spring 2020': {
-    instructionBegins: { year: 2020, month: 2, day: 30, hour: 8, minute: 0 },
-    instructionEnds: { year: 2020, month: 5, day: 5, hour: 23, minute: 59 }
-  },
-  'Autumn 2020': {
-    instructionBegins: { year: 2020, month: 8, day: 30, hour: 8, minute: 0 },
-    instructionEnds: { year: 2020, month: 11, day: 11, hour: 23, minute: 59 }
-  },
-  'Fall 2020': {
-    instructionBegins: { year: 2020, month: 8, day: 30, hour: 8, minute: 0 },
-    instructionEnds: { year: 2020, month: 11, day: 11, hour: 23, minute: 59 }
-  },
-  'Winter 2021': {
-    instructionBegins: { year: 2021, month: 0, day: 4, hour: 8, minute: 0 },
-    instructionEnds: { year: 2021, month: 2, day: 12, hour: 23, minute: 59 }
-  },
-  'Spring 2021': {
-    instructionBegins: { year: 2021, month: 2, day: 29, hour: 8, minute: 0 },
-    instructionEnds: { year: 2021, month: 5, day: 4, hour: 23, minute: 59 }
-  },
-  'Autumn 2021': {
-    instructionBegins: { year: 2021, month: 8, day: 29, hour: 8, minute: 0 },
-    instructionEnds: { year: 2021, month: 11, day: 10, hour: 23, minute: 59 }
-  },
-  'Fall 2021': {
-    instructionBegins: { year: 2021, month: 8, day: 29, hour: 8, minute: 0 },
-    instructionEnds: { year: 2021, month: 11, day: 10, hour: 23, minute: 59 }
-  },
-  'Winter 2022': {
-    instructionBegins: { year: 2022, month: 0, day: 3, hour: 8, minute: 0 },
-    instructionEnds: { year: 2022, month: 2, day: 11, hour: 23, minute: 59 }
-  },
-  'Spring 2022': {
-    instructionBegins: { year: 2022, month: 2, day: 28, hour: 8, minute: 0 },
-    instructionEnds: { year: 2022, month: 5, day: 3, hour: 23, minute: 59 }
-  },
-  'Summer 2022': {
-    instructionBegins: { year: 2022, month: 5, day: 21, hour: 8, minute: 0 },
-    instructionEnds: { year: 2022, month: 7, day: 19, hour: 23, minute: 59 }
-  },
-  'Autumn 2022': {
-    instructionBegins: { year: 2022, month: 8, day: 28, hour: 8, minute: 0 },
-    instructionEnds: { year: 2022, month: 11, day: 9, hour: 23, minute: 59 }
-  },
-  'Fall 2022': {
-    instructionBegins: { year: 2022, month: 8, day: 28, hour: 8, minute: 0 },
-    instructionEnds: { year: 2022, month: 11, day: 9, hour: 23, minute: 59 }
-  },
+const getQuarterDates = (year, quarter) => {
+  return {
+    instructionBegins: {
+      year: year,
+      month:
+        quarter === "Autumn" || quarter === "Fall"
+          ? 8
+          : quarter === "Winter"
+          ? 0
+          : 2,
+      day: 25,
+      hour: 8,
+      minute: 0,
+    },
+    instructionEnds: {
+      year: year,
+      month:
+        quarter === "Autumn" || quarter === "Fall"
+          ? 11
+          : quarter === "Winter"
+          ? 2
+          : 5,
+      day: 6,
+      hour: 23,
+      minute: 59,
+    },
+  };
 };
 
 /**
  * Map of registration page day symbols to ics spec (excluding Saturday and
- * Sunday, since these are weekends and are not expected to show up in the 
+ * Sunday, since these are weekends and are not expected to show up in the
  * registration page)
  */
 const dayMap = {
-  "M": "MO",
-  "T": "TU",
-  "W": "WE",
-  "Th": "TH",
-  "F": "FR",
-}
-
+  M: "MO",
+  T: "TU",
+  W: "WE",
+  Th: "TH",
+  F: "FR",
+};
 
 /**
  * Map of column indices in the registration page table to the corresponding
  * information types
  */
 const COURSE_PROPERTY_INDICES = {
-  1: 'sln',
-  2: 'course',
-  3: 'type',
-  4: 'credits',
-  6: 'title',
-  7: 'days',
-  8: 'time',
-  9: 'location',
-  10: 'instructor'
-}
+  1: "sln",
+  2: "course",
+  3: "type",
+  4: "credits",
+  6: "title",
+  7: "days",
+  8: "time",
+  9: "location",
+  10: "instructor",
+};
 
 /**
  * Map of values for Date.prototype.getDay()
@@ -133,7 +98,7 @@ function App() {
   var instructionEnds = {};
 
   function createElementFromHTML(htmlString) {
-    var div = document.createElement('div');
+    var div = document.createElement("div");
     div.innerHTML = htmlString.trim();
 
     // Change this to div.childNodes to support multiple top-level nodes
@@ -146,11 +111,15 @@ function App() {
    * @param tableHTML html string of the table element being parsed
    */
   function readTable(tableHTML) {
-    console.log("reading table")
+    console.log("reading table");
     var table = createElementFromHTML(tableHTML);
     var rows = table.getElementsByTagName("tr");
     var parsedRowList = [];
-    for (var i = skippableHeaderRows; i < rows.length - skippableFooterRows; i++) {
+    for (
+      var i = skippableHeaderRows;
+      i < rows.length - skippableFooterRows;
+      i++
+    ) {
       var columnsThisRow = rows[i].getElementsByTagName("td");
       var parsedRow = {};
 
@@ -158,7 +127,15 @@ function App() {
       var dropCodeColumnOffset = columnsThisRow.length > 11 ? 1 : 0;
 
       for (var j in COURSE_PROPERTY_INDICES) {
-        parsedRow[COURSE_PROPERTY_INDICES[j]] = (columnsThisRow[parseInt(j) + dropCodeColumnOffset]) ? createElementFromHTML(columnsThisRow[parseInt(j) + dropCodeColumnOffset].innerHTML.replace("<br>", "\n")).innerText.trim() : null;
+        parsedRow[COURSE_PROPERTY_INDICES[j]] = columnsThisRow[
+          parseInt(j) + dropCodeColumnOffset
+        ]
+          ? createElementFromHTML(
+              columnsThisRow[
+                parseInt(j) + dropCodeColumnOffset
+              ].innerHTML.replace("<br>", "\n")
+            ).innerText.trim()
+          : null;
       }
       parsedRowList.push(parsedRow);
     }
@@ -173,13 +150,29 @@ function App() {
   function getTable() {
     console.log("requesting data from content script");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { header: "table" }, undefined, function (response) {
-        var quarterName = response["quarter"].split("-")[1].trim();
-        instructionBegins = QUARTER_DATES[quarterName].instructionBegins;
-        instructionEnds = QUARTER_DATES[quarterName].instructionEnds;
-        console.log("received data from content script!");
-        populateEvents(readTable(response["table"]));
-      });
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { header: "table" },
+        undefined,
+        function (response) {
+          var quarterName = response["quarter"].split("-")[1].trim();
+          
+          console.error("quarterName", quarterName)
+          var year = parseInt(quarterName.split(" ")[1]);
+          var quarter = quarterName.split(" ")[0].trim();
+          
+          console.error("year", year);
+          console.log("quarter", quarter);
+
+          instructionBegins = getQuarterDates(year, quarter).instructionBegins;
+          instructionEnds = getQuarterDates(year, quarter).instructionEnds;
+
+          console.error("received data from content script!");
+          console.error("instruction begins: " + instructionBegins);
+          console.error("instruction ends: " + instructionEnds);
+          populateEvents(readTable(response["table"]));
+        }
+      );
     });
   }
 
@@ -196,7 +189,11 @@ function App() {
     for (let i = 0; i < splitDays.length; i++) {
       let letter = splitDays[i];
       if (letter in dayMap) {
-        if (letter === "T" && i + 1 < splitDays.length && splitDays[i + 1] === "h") {
+        if (
+          letter === "T" &&
+          i + 1 < splitDays.length &&
+          splitDays[i + 1] === "h"
+        ) {
           letter = "Th";
           i++;
         }
@@ -237,7 +234,7 @@ function App() {
   function parseTimeRow(timeString) {
     var pmInString = timeString.includes("P") || timeString.includes("PM");
     timeString = timeString.replace("PM", "").replace("P", "").trim();
-    var splitTimeString = timeString.split("-").map(x => x.trim());
+    var splitTimeString = timeString.split("-").map((x) => x.trim());
     if (splitTimeString.length !== 2) {
       console.error("incorrect time string: " + timeString);
       return null;
@@ -245,11 +242,11 @@ function App() {
       var startHourMinute = getHourAndMinute(splitTimeString[0]);
       var endHourMinute = getHourAndMinute(splitTimeString[1]);
 
-      if (pmInString || startHourMinute['hour'] < 8) {
-        startHourMinute['hour'] += 12;
-        endHourMinute['hour'] += 12;
-      } else if (endHourMinute['hour'] < 8) {
-        endHourMinute['hour'] += 12;
+      if (pmInString || startHourMinute["hour"] < 8) {
+        startHourMinute["hour"] += 12;
+        endHourMinute["hour"] += 12;
+      } else if (endHourMinute["hour"] < 8) {
+        endHourMinute["hour"] += 12;
       }
 
       return { startTime: startHourMinute, endTime: endHourMinute };
@@ -262,9 +259,19 @@ function App() {
    * @param {*} weekdays a non-empty array containing ics-style days
    */
   function getStartDateOffset(weekdays) {
-    var instructionBeginsWeekdayNumber = new Date(instructionBegins.year, instructionBegins.month, instructionBegins.day).getDay();
+    var instructionBeginsWeekdayNumber = new Date(
+      instructionBegins.year,
+      instructionBegins.month,
+      instructionBegins.day
+    ).getDay();
     var offset = 0;
-    while (weekdays.indexOf(DAY_SEQUENCE[(instructionBeginsWeekdayNumber + offset) % DAY_SEQUENCE.length]) === -1) {
+    while (
+      weekdays.indexOf(
+        DAY_SEQUENCE[
+          (instructionBeginsWeekdayNumber + offset) % DAY_SEQUENCE.length
+        ]
+      ) === -1
+    ) {
       offset++;
     }
 
@@ -280,44 +287,88 @@ function App() {
     console.log("populating events");
     var eventList = [];
     for (var tableRow of tableRows) {
-      if (tableRow["days"] && tableRow["time"]) {
-        let parsedDayRows = tableRow["days"].split("\n").map(dayString => parseDaysRow(dayString.trim()));
-        let parsedTimeRows = tableRow["time"].split("\n").map(timeString => parseTimeRow(timeString.trim()));
-        let parsedLocationRows = tableRow["location"].split("\n").map(locationString => locationString.trim());
-        if (parsedLocationRows.length !== parsedDayRows.length) {
-          console.error("day and location count mismatch for the following row: " + tableRow);
-          return null;
-        }
-        if (parsedDayRows.length !== parsedTimeRows.length) {
-          console.error("day and row count mismatch for the following row: " + tableRow);
-          return null;
-        } else {
-          for (var i = 0; i < parsedDayRows.length; i++) {
-            var beginTime = parsedTimeRows[i].startTime;
-            var endTime = parsedTimeRows[i].endTime;
-            var beginDateTempObject = { ...instructionBegins, hour: beginTime.hour, minute: beginTime.minute };
-            var endDateTempObject = { ...instructionBegins, hour: endTime.hour, minute: endTime.minute };
-            var dateOffset = getStartDateOffset(parsedDayRows[i]);
-
-            let event = {
-              subject: tableRow["course"], description: tableRow["title"] + " (" + tableRow["type"].trim() + ")",
-              location: parsedLocationRows[i],
-              beginDate: (new Date(beginDateTempObject.year, beginDateTempObject.month, beginDateTempObject.day,
-                beginDateTempObject.hour, beginDateTempObject.minute)).addDays(dateOffset),
-              endDate: new Date(endDateTempObject.year, endDateTempObject.month, endDateTempObject.day, endDateTempObject.hour, endDateTempObject.minute).addDays(dateOffset),
-              rrule: {
-                freq: "WEEKLY", until: new Date(instructionEnds.year, instructionEnds.month, instructionEnds.day, instructionEnds.hour, instructionEnds.minute),
-                interval: 1, byday: parsedDayRows[i]
-              },
-              uidHelper: (tableRow["sln"] + "_" + i)
-            };
-            eventList.push(event);
+      try {
+        if (tableRow["days"] && tableRow["time"]) {
+          let parsedDayRows = tableRow["days"]
+            .split("\n")
+            .map((dayString) => parseDaysRow(dayString.trim()));
+          let parsedTimeRows = tableRow["time"]
+            .split("\n")
+            .map((timeString) => parseTimeRow(timeString.trim()));
+          let parsedLocationRows = tableRow["location"]
+            .split("\n")
+            .map((locationString) => locationString.trim());
+          if (parsedLocationRows.length !== parsedDayRows.length) {
+            console.error(
+              "day and location count mismatch for the following row: " + tableRow
+            );
+            return null;
+          }
+          if (parsedDayRows.length !== parsedTimeRows.length) {
+            console.error(
+              "day and row count mismatch for the following row: " + tableRow
+            );
+            return null;
+          } else {
+            for (var i = 0; i < parsedDayRows.length; i++) {
+              var beginTime = parsedTimeRows[i].startTime;
+              var endTime = parsedTimeRows[i].endTime;
+              var beginDateTempObject = {
+                ...instructionBegins,
+                hour: beginTime.hour,
+                minute: beginTime.minute,
+              };
+              var endDateTempObject = {
+                ...instructionBegins,
+                hour: endTime.hour,
+                minute: endTime.minute,
+              };
+              var dateOffset = getStartDateOffset(parsedDayRows[i]);
+  
+              let event = {
+                subject: tableRow["course"],
+                description:
+                  tableRow["title"] + " (" + tableRow["type"].trim() + ")",
+                location: parsedLocationRows[i],
+                beginDate: new Date(
+                  beginDateTempObject.year,
+                  beginDateTempObject.month,
+                  beginDateTempObject.day,
+                  beginDateTempObject.hour,
+                  beginDateTempObject.minute
+                ).addDays(dateOffset),
+                endDate: new Date(
+                  endDateTempObject.year,
+                  endDateTempObject.month,
+                  endDateTempObject.day,
+                  endDateTempObject.hour,
+                  endDateTempObject.minute
+                ).addDays(dateOffset),
+                rrule: {
+                  freq: "WEEKLY",
+                  until: new Date(
+                    instructionEnds.year,
+                    instructionEnds.month,
+                    instructionEnds.day,
+                    instructionEnds.hour,
+                    instructionEnds.minute
+                  ),
+                  interval: 1,
+                  byday: parsedDayRows[i],
+                },
+                uidHelper: tableRow["sln"] + "_" + i,
+              };
+              eventList.push(event);
+            }
           }
         }
+      } catch (e) {
+        console.error("error parsing row: " + tableRow);
+        console.error(e);
       }
     }
     console.log("events:");
-    eventList.forEach(event => console.log(event));
+    eventList.forEach((event) => console.log(event));
     setEvents(eventList);
   }
 
@@ -327,7 +378,11 @@ function App() {
   function sendEvents() {
     console.log("sending events to content script");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, { header: "download", events: events }, undefined);
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { header: "download", events: events },
+        undefined
+      );
     });
   }
 
@@ -338,67 +393,89 @@ function App() {
 
   const useStyles = makeStyles({
     table: {
-      height: '100%',
-      width: '100%',
-      overflowY: 'auto'
+      height: "100%",
+      width: "100%",
+      overflowY: "auto",
     },
     tableHeader: {
-      backgroundColor: '#b7a57a',
-      color: 'white',
+      backgroundColor: "#b7a57a",
+      color: "white",
       position: "sticky",
       top: 0,
       zIndex: 10,
       whiteSpace: "nowrap",
-      overflow: "hidden"
+      overflow: "hidden",
     },
     tableBody: {
-      overflowY: 'auto'
+      overflowY: "auto",
     },
     buttonContainer: {
-      textAlign: 'center'
+      textAlign: "center",
     },
     button: {
-      background: '#b7a57a',
-      width: '80%',
+      background: "#b7a57a",
+      width: "80%",
       border: 0,
-      margin: '20px',
+      margin: "20px",
       borderRadius: 3,
-      color: 'white',
-      height: '45px',
-      padding: '0 30px',
-      '&:hover': {
+      color: "white",
+      height: "45px",
+      padding: "0 30px",
+      "&:hover": {
         background: "#85754d",
       },
     },
     tableRow: {
       whiteSpace: "nowrap",
       overflow: "hidden",
-    }
+    },
   });
 
   const classes = useStyles();
 
   function onRenderEvents() {
-    return events.map(event => <TableRow>
-      <TableCell className={classes.tableRow}>{event["subject"]}</TableCell>
-      <TableCell className={classes.tableRow} align="right">{event['rrule'].byday.join(', ')}</TableCell>
-      <TableCell className={classes.tableRow} align="right">{event['beginDate'].getHours().toString().padStart(2, '0') + ':' + event['beginDate'].getMinutes().toString().padStart(2, '0')}</TableCell>
-      <TableCell className={classes.tableRow} align="right">{event['endDate'].getHours().toString().padStart(2, '0') + ':' + event['endDate'].getMinutes().toString().padStart(2, '0')}</TableCell>
-      <TableCell className={classes.tableRow} align="right">{event["location"]}</TableCell>
-    </TableRow>)
+    return events.map((event) => (
+      <TableRow>
+        <TableCell className={classes.tableRow}>{event["subject"]}</TableCell>
+        <TableCell className={classes.tableRow} align="right">
+          {event["rrule"].byday.join(", ")}
+        </TableCell>
+        <TableCell className={classes.tableRow} align="right">
+          {event["beginDate"].getHours().toString().padStart(2, "0") +
+            ":" +
+            event["beginDate"].getMinutes().toString().padStart(2, "0")}
+        </TableCell>
+        <TableCell className={classes.tableRow} align="right">
+          {event["endDate"].getHours().toString().padStart(2, "0") +
+            ":" +
+            event["endDate"].getMinutes().toString().padStart(2, "0")}
+        </TableCell>
+        <TableCell className={classes.tableRow} align="right">
+          {event["location"]}
+        </TableCell>
+      </TableRow>
+    ));
   }
 
   return (
     <div>
       <div className={classes.table}>
         <Table>
-          <TableHead >
+          <TableHead>
             <TableRow>
               <TableCell className={classes.tableHeader}>Course</TableCell>
-              <TableCell className={classes.tableHeader} align="right">Days</TableCell>
-              <TableCell className={classes.tableHeader} align="right">Start Time</TableCell>
-              <TableCell className={classes.tableHeader} align="right">End Time</TableCell>
-              <TableCell className={classes.tableHeader} align="right">Location</TableCell>
+              <TableCell className={classes.tableHeader} align="right">
+                Days
+              </TableCell>
+              <TableCell className={classes.tableHeader} align="right">
+                Start Time
+              </TableCell>
+              <TableCell className={classes.tableHeader} align="right">
+                End Time
+              </TableCell>
+              <TableCell className={classes.tableHeader} align="right">
+                Location
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody className={classes.tableBody}>
@@ -407,7 +484,12 @@ function App() {
         </Table>
       </div>
       <div className={classes.buttonContainer}>
-        <Button className={classes.button} onClick={sendEvents} variant="contained" color="primary">
+        <Button
+          className={classes.button}
+          onClick={sendEvents}
+          variant="contained"
+          color="primary"
+        >
           Download .ics file
         </Button>
       </div>
