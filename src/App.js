@@ -16,35 +16,94 @@ Date.prototype.addDays = function (days) {
   return date;
 };
 
+
+const quartersDates = {
+  'Autumn 2019': {
+    instructionBegins: { year: 2019, month: 8, day: 25, hour: 8, minute: 0 },
+    instructionEnds: { year: 2019, month: 11, day: 6, hour: 23, minute: 59 }
+  },
+  'Fall 2019': {
+    instructionBegins: { year: 2019, month: 8, day: 25, hour: 8, minute: 0 },
+    instructionEnds: { year: 2019, month: 11, day: 6, hour: 23, minute: 59 }
+  },
+  'Winter 2020': {
+    instructionBegins: { year: 2020, month: 0, day: 6, hour: 8, minute: 0 },
+    instructionEnds: { year: 2020, month: 2, day: 13, hour: 23, minute: 59 }
+  },
+  'Spring 2020': {
+    instructionBegins: { year: 2020, month: 2, day: 30, hour: 8, minute: 0 },
+    instructionEnds: { year: 2020, month: 5, day: 5, hour: 23, minute: 59 }
+  },
+  'Autumn 2020': {
+    instructionBegins: { year: 2020, month: 8, day: 30, hour: 8, minute: 0 },
+    instructionEnds: { year: 2020, month: 11, day: 11, hour: 23, minute: 59 }
+  },
+  'Fall 2020': {
+    instructionBegins: { year: 2020, month: 8, day: 30, hour: 8, minute: 0 },
+    instructionEnds: { year: 2020, month: 11, day: 11, hour: 23, minute: 59 }
+  },
+  'Winter 2021': {
+    instructionBegins: { year: 2021, month: 0, day: 4, hour: 8, minute: 0 },
+    instructionEnds: { year: 2021, month: 2, day: 12, hour: 23, minute: 59 }
+  },
+  'Spring 2021': {
+    instructionBegins: { year: 2021, month: 2, day: 29, hour: 8, minute: 0 },
+    instructionEnds: { year: 2021, month: 5, day: 4, hour: 23, minute: 59 }
+  },
+  'Autumn 2021': {
+    instructionBegins: { year: 2021, month: 8, day: 29, hour: 8, minute: 0 },
+    instructionEnds: { year: 2021, month: 11, day: 10, hour: 23, minute: 59 }
+  },
+  'Fall 2021': {
+    instructionBegins: { year: 2021, month: 8, day: 29, hour: 8, minute: 0 },
+    instructionEnds: { year: 2021, month: 11, day: 10, hour: 23, minute: 59 }
+  },
+  'Winter 2022': {
+    instructionBegins: { year: 2022, month: 0, day: 3, hour: 8, minute: 0 },
+    instructionEnds: { year: 2022, month: 2, day: 11, hour: 23, minute: 59 }
+  },
+  'Spring 2022': {
+    instructionBegins: { year: 2022, month: 2, day: 28, hour: 8, minute: 0 },
+    instructionEnds: { year: 2022, month: 5, day: 3, hour: 23, minute: 59 }
+  },
+  'Summer 2022': {
+    instructionBegins: { year: 2022, month: 5, day: 21, hour: 8, minute: 0 },
+    instructionEnds: { year: 2022, month: 7, day: 19, hour: 23, minute: 59 }
+  },
+  'Autumn 2022': {
+    instructionBegins: { year: 2022, month: 8, day: 28, hour: 8, minute: 0 },
+    instructionEnds: { year: 2022, month: 11, day: 9, hour: 23, minute: 59 }
+  },
+  'Fall 2022': {
+    instructionBegins: { year: 2022, month: 8, day: 28, hour: 8, minute: 0 },
+    instructionEnds: { year: 2022, month: 11, day: 9, hour: 23, minute: 59 }
+  },
+
+  'Autumn 2023': {
+    instructionBegins: { year: 2023, month: 8, day: 27, hour: 8, minute: 0 },
+    instructionEnds: { year: 2023, month: 11, day: 8, hour: 23, minute: 59 }
+  },
+  'Fall 2023': {
+    instructionBegins: { year: 2023, month: 8, day: 27, hour: 8, minute: 0 },
+    instructionEnds: { year: 2023, month: 11, day: 8, hour: 23, minute: 59 }
+  },
+  'Winter 2024': {
+    instructionBegins: { year: 2024, month: 0, day: 3, hour: 8, minute: 0 },
+    instructionEnds: { year: 2024, month: 2, day: 8, hour: 23, minute: 59 }
+  },
+  'Spring 2024': {
+    instructionBegins: { year: 2024, month: 2, day: 25, hour: 8, minute: 0 },
+    instructionEnds: { year: 2024, month: 4, day: 31, hour: 23, minute: 59 }
+  }
+}
+
 /**
  * Start and end dates
  */
 const getQuarterDates = (year, quarter) => {
   return {
-    instructionBegins: {
-      year: year,
-      month:
-        quarter === "Autumn" || quarter === "Fall"
-          ? 8
-          : quarter === "Winter"
-          ? 0
-          : 2,
-      day: 25,
-      hour: 8,
-      minute: 0,
-    },
-    instructionEnds: {
-      year: year,
-      month:
-        quarter === "Autumn" || quarter === "Fall"
-          ? 11
-          : quarter === "Winter"
-          ? 2
-          : 5,
-      day: 6,
-      hour: 23,
-      minute: 59,
-    },
+    instructionBegins: quartersDates[`${quarter} ${year}`].instructionBegins,
+    instructionEnds: quartersDates[`${quarter} ${year}`].instructionEnds,
   };
 };
 
