@@ -1,6 +1,6 @@
 {
   "name": "uw-schedule-exporter",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.10.0",
