@@ -1,6 +1,6 @@
 {
-  "name": "my-extension",
-  "version": "0.1.8",
+  "name": "uw-schedule-exporter",
+  "version": "0.1.9",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.10.0",

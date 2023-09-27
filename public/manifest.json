@@ -1,22 +1,13 @@
 {
   "name": "UW Schedule Exporter",
-  "version": "1.0.7",
+  "version": "0.1.9",
   "description": "Extension to read course information from the UW registration page and export it to a .ics file",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "permissions": [
     "declarativeContent",
     "activeTab",
     "downloads"
   ],
-  "page_action": {
-    "default_popup": "index.html",
-    "default_icon": {
-      "16": "images/logo-small.png",
-      "32": "images/logo-small.png",
-      "48": "images/logo-small.png",
-      "128": "images/logo-small.png"
-    }
-  },
   "icons": {
     "16": "images/logo-small.png",
     "32": "images/logo-small.png",
@@ -24,10 +15,8 @@
     "128": "images/logo-small.png"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ],
-    "persistent": false
+    "persistent": false,
+    "service_worker": "serviceWorker.js"
   },
   "content_scripts": [
     {
@@ -40,5 +29,17 @@
         "content-script.js"
       ]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "images/logo-small.png",
+      "32": "images/logo-small.png",
+      "48": "images/logo-small.png",
+      "128": "images/logo-small.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": {}
+  }
 }
